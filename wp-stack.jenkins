@@ -1,0 +1,24 @@
+#!groovy
+properties([disableConcurrentBuilds()])
+
+pipeline {
+    agent { 
+        label 'master'
+        }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
+        timestamps()
+    }
+    stages {
+        stage("Docker installation") {
+            steps {
+                sh 'ssh $UserName@$ServerHost "sudo apt-get update && sudo apt-get install -y docker docker-compose"'
+            }
+        }
+        stage("Word Press stack installation") {
+            steps {
+                sh 'ssh $UserName@$ServerHost "git clone https://github.com/SaNToS/wp-stack.git wp-stack && cd wp-stack && sudo docker-compose up -d"'
+            }
+        }
+    }
+}
